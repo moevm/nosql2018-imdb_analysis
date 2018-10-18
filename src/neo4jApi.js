@@ -52,12 +52,10 @@ function getMovie(title) {
     });
 }
 
-function getGraph() {
+function getGraph(limit) {
   var session = driver.session();
   return session.run(
-    'MATCH (m:Movie)<-[:ACTED_IN]-(a:Person) \
-    RETURN m.title AS movie, collect(a.name) AS cast \
-    LIMIT {limit}', {limit: 100})
+    'MATCH (m:Movie)<-[:ACTS_IN]-(a:Person) RETURN m.title AS movie, collect(a.name) AS cast LIMIT {limit}', {limit})
     .then(results => {
       session.close();
       var nodes = [], rels = [], i = 0;

@@ -26,9 +26,9 @@
             <div class="tabs">
                 <div class="tab-button-outer">
                     <ul id="tab-button">
-                        <li><a href="#tab01">Tab 1</a></li>
-                        <li><a href="#tab02">Tab 2</a></li>
-                        <li><a href="#tab03">Tab 3</a></li>
+                        <li><a href="#tab01">Person</a></li>
+                        <li><a href="#tab02">Movie</a></li>
+                        <li><a href="#tab03">Relation</a></li>
                     </ul>
                 </div>
                 <div class="tab-select-outer">
@@ -40,15 +40,11 @@
                 </div>
 
                 <div id="tab01" class="tab-contents">
-                    <form>
-                        <div class="form-row">
-                            <div class="col">
-                                <input type="text" class="form-control" placeholder="First name">
-                            </div>
-                            <div class="col">
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </div>
+                    <form role="search" class="navbar-form" id="search">
+                        <div class="form-group">
+                            <input type="text" value="Matrix" placeholder="Search for Movie Title" class="form-control" name="search">
                         </div>
+                        <button class="btn btn-default" type="submit">Search</button>
                     </form>
                 </div>
                 <div id="tab02" class="tab-contents">
@@ -174,8 +170,12 @@
 </style>
 
 <script>
+    function showPersonGraph() {
+        renderGraph(getPerson($('#personName').text()));
+    }
+
     $(function () {
-        var $tabButtonItem = $('#tab-button li'),
+        let $tabButtonItem = $('#tab-button li'),
             $tabSelect = $('#tab-select'),
             $tabContents = $('.tab-contents'),
             activeClass = 'is-active';
@@ -184,7 +184,7 @@
         $tabContents.not(':first').hide();
 
         $tabButtonItem.find('a').on('click', function (e) {
-            var target = $(this).attr('href');
+            let target = $(this).attr('href');
 
             $tabButtonItem.removeClass(activeClass);
             $(this).parent().addClass(activeClass);
@@ -195,7 +195,7 @@
         });
 
         $tabSelect.on('change', function () {
-            var target = $(this).val(),
+            let target = $(this).val(),
                 targetSelectNum = $(this).prop('selectedIndex');
 
             $tabButtonItem.removeClass(activeClass);

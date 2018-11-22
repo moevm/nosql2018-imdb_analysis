@@ -7,80 +7,109 @@ var neo4j = window.neo4j.v1;
 var driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic("neo4j", "qwerty"));
 
 function searchMovies(queryString) {
-  var session = driver.session();
-  return session
-    .run(
-      'MATCH (movie:Movie) \
-      WHERE movie.title =~ {title} \
-      RETURN movie',
-      {title: '(?i).*' + queryString + '.*'}
-    )
-    .then(result => {
-      session.close();
-      return result.records.map(record => {
-        return new Movie(record.get('movie'));
-      });
-    })
-    .catch(error => {
-      session.close();
-      throw error;
-    });
+    var session = driver.session();
+    return session
+        .run(
+            'MATCH (movie:Movie) \
+            WHERE movie.title =~ {title} \
+            RETURN movie',
+            {title: '(?i).*' + queryString + '.*'}
+        )
+        .then(result => {
+            session.close();
+            return result.records.map(record => {
+                return new Movie(record.get('movie'));
+            });
+        })
+        .catch(error => {
+            session.close();
+            throw error;
+        });
 }
 
 function getMovie(title) {
-  var session = driver.session();
-  return session
-    .run(
-      "MATCH (movie:Movie {title:{title}}) \
-      OPTIONAL MATCH (movie)<-[r]-(person:Person) \
-      RETURN movie.title AS title, \
-      collect([person.name, \
-           head(split(lower(type(r)), '_')), r.roles]) AS cast \
-      LIMIT 1", {title})
-    .then(result => {
-      session.close();
+    var session = driver.session();
+    return session
+        .run(
+            "MATCH (movie:Movie {title:{title}}) \
+            OPTIONAL MATCH (movie)<-[r]-(person:Person) \
+            RETURN movie.title AS title, \
+            collect([person.name, \
+                 head(split(lower(type(r)), '_')), r.roles]) AS cast \
+            LIMIT 1", {title})
+        .then(result => {
+            session.close();
 
-      if (_.isEmpty(result.records))
-        return null;
+            if (_.isEmpty(result.records))
+                return null;
 
-      var record = result.records[0];
-      return new MovieCast(record.get('title'), record.get('cast'));
-    })
-    .catch(error => {
-      session.close();
-      throw error;
-    });
+            var record = result.records[0];
+            return new MovieCast(record.get('title'), record.get('cast'));
+        })
+        .catch(error => {
+            session.close();
+            throw error;
+        });
 }
 
-function getGraph(limit) {
-  var session = driver.session();
-  return session.run(
-    'MATCH (m:Movie)<-[:ACTS_IN]-(a:Person) RETURN m.title AS movie, collect(a.name) AS cast LIMIT {limit}', {limit})
-    .then(results => {
-      session.close();
-      var nodes = [], rels = [], i = 0;
-      results.records.forEach(res => {
-        nodes.push({title: res.get('movie'), label: 'movie'});
-        var target = i;
-        i++;
+function getPerson(name) {
+    let session = driver.session();
+    return session.run('MATCH (p:Person{name:{title}})-[:ACTS_IN]-(a:Movie) RETURN p.name as person,collect(a.title) as movies LIMIT 50', {title: name})
+        .then(results => {
+            session.close();
+            var nodes = [], rels = [], i = 0;
+            results.records.forEach(res => {
+                nodes.push({title: res.get('person'), label: 'actor'});
+                var target = i;
+                i++;
 
-        res.get('cast').forEach(name => {
-          var actor = {title: name, label: 'actor'};
-          var source = _.findIndex(nodes, actor);
-          if (source == -1) {
-            nodes.push(actor);
-            source = i;
-            i++;
-          }
-          rels.push({source, target})
+                res.get('movies').forEach(name => {
+                    var movie = {title: name, label: 'movie'};
+                    var source = _.findIndex(nodes, movie);
+                    if (source == -1) {
+                        nodes.push(movie);
+                        source = i;
+                        i++;
+                    }
+                    rels.push({source, target})
+                })
+            });
+
+            return {nodes, links: rels};
         })
-      });
+}
 
-      return {nodes, links: rels};
-    });
+
+function getGraph(limit) {
+    var session = driver.session();
+    return session.run(
+        'MATCH (m:Movie)<-[:ACTS_IN]-(a:Person) RETURN m.title AS movie, collect(a.name) AS cast LIMIT {limit}', {limit})
+        .then(results => {
+            session.close();
+            var nodes = [], rels = [], i = 0;
+            results.records.forEach(res => {
+                nodes.push({title: res.get('movie'), label: 'movie'});
+                var target = i;
+                i++;
+
+                res.get('cast').forEach(name => {
+                    var actor = {title: name, label: 'actor'};
+                    var source = _.findIndex(nodes, actor);
+                    if (source == -1) {
+                        nodes.push(actor);
+                        source = i;
+                        i++;
+                    }
+                    rels.push({source, target})
+                })
+            });
+
+            return {nodes, links: rels};
+        });
 }
 
 exports.searchMovies = searchMovies;
 exports.getMovie = getMovie;
+exports.getPerson = getPerson;
 exports.getGraph = getGraph;
 

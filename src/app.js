@@ -1,12 +1,13 @@
 var api = require('./neo4jApi');
 
 $(function () {
-    renderGraph();
+    // renderGraph(api.getPerson('Quentin Tarantino'));
+    renderGraph(api.getPerson('Keanu Reeves'));
     search();
 
     $("#search").submit(e => {
         e.preventDefault();
-        search();
+        renderGraph(api.getPerson($("#search").find("input[name=search]").val()));
     });
 });
 
@@ -48,7 +49,7 @@ function search() {
         });
 }
 
-function renderGraph() {
+function renderGraph(fun) {
     var width = 800, height = 800;
     var force = d3
         .layout
@@ -57,61 +58,63 @@ function renderGraph() {
         .linkDistance(30)
         .size([width, height]);
 
+    d3.select("#graph").selectAll("*").remove();
+
     var svg = d3
         .select("#graph")
         .append("svg")
         .attr("width", "100%")
         .attr("height", "100%")
         .attr("pointer-events", "all");
+    fun.then(graph => {
+        force.nodes(graph.nodes).links(graph.links).start();
 
-    api
-        .getGraph(10)
-        .then(graph => {
-            force.nodes(graph.nodes).links(graph.links).start();
+        // svg.selectAll(".link").remove();//add this to remove the links
+        // svg.selectAll(".node").remove();//add this to remove the nodes
 
-            var link = svg.selectAll(".link")
-                .data(force.links())
-                .enter().append("line")
-                .attr("class", "link");
+        var link = svg.selectAll(".link")
+            .data(force.links())
+            .enter().append("line")
+            .attr("class", "link");
 
-            var node = svg.selectAll(".node")
-                .data(force.nodes())
-                .enter().append("g")
-                .attr("class", "node")
-                .call(force.drag);
+        var node = svg.selectAll(".node")
+            .data(force.nodes())
+            .enter().append("g")
+            .attr("class", "node")
+            .call(force.drag);
 
-            node.append("circle")
-                .attr("class", d => {
-                    return "node " + d.label
+        node.append("circle")
+            .attr("class", d => {
+                return "node " + d.label
+            })
+            .attr("r", 8);
+
+        node.append("text")
+            .attr("x", 12)
+            .attr("dy", ".35em")
+            .text(function (d) {
+                return d.title;
+            });
+
+        force.on("tick", () => {
+            link
+                .attr("x1", function (d) {
+                    return d.source.x;
                 })
-                .attr("r", 8);
-
-            node.append("text")
-                .attr("x", 12)
-                .attr("dy", ".35em")
-                .text(function (d) {
-                    return d.title;
+                .attr("y1", function (d) {
+                    return d.source.y;
+                })
+                .attr("x2", function (d) {
+                    return d.target.x;
+                })
+                .attr("y2", function (d) {
+                    return d.target.y;
                 });
 
-            force.on("tick", () => {
-                link
-                    .attr("x1", function (d) {
-                        return d.source.x;
-                    })
-                    .attr("y1", function (d) {
-                        return d.source.y;
-                    })
-                    .attr("x2", function (d) {
-                        return d.target.x;
-                    })
-                    .attr("y2", function (d) {
-                        return d.target.y;
-                    });
-
-                node
-                    .attr("transform", function (d) {
-                        return "translate(" + d.x + "," + d.y + ")";
-                    });
-            })
-        });
+            node
+                .attr("transform", function (d) {
+                    return "translate(" + d.x + "," + d.y + ")";
+                });
+        })
+    });
 }

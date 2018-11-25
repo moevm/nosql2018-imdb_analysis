@@ -1,15 +1,43 @@
 var api = require('./neo4jApi');
 
 $(function () {
-    // renderGraph(api.getPerson('Quentin Tarantino'));
-    renderGraph(api.getPerson('Keanu Reeves'));
+    fillActor('Quentin Tarantino');
+    fillDirector('Quentin Tarantino');
+    renderGraph(api.getPerson('Quentin Tarantino'));
     search();
 
     $("#search").submit(e => {
         e.preventDefault();
-        renderGraph(api.getPerson($("#search").find("input[name=search]").val()));
+        let name = $("#search").find("input[name=search]").val();
+        fillActor(name);
+        fillDirector(name);
+        renderGraph(api.getPerson(name));
     });
 });
+
+function fillActor(name) {
+    $('#actor_table').find('tbody:first').find('tr').remove();
+    api.getPersonRoles(name).then(resuts => {
+        resuts.forEach(res => {
+            let date = new Date(parseInt(res.year, 10)).getFullYear();
+            $('#actor_table').find('tbody:first').append('<tr><td scope="row">' + res.title +
+                '</td><td>' + date +
+                '</td><td>' + res.role + '</td></tr>');
+        });
+    })
+}
+
+function fillDirector(name) {
+    $('#director_table').find('tbody:first').find('tr').remove();
+    api.getPersonDirectedMovies(name).then(resuts => {
+        resuts.forEach(res => {
+            console.log(date + ';' + res.title);
+            let date = new Date(parseInt(res.year, 10)).getFullYear();
+            $('#director_table').find('tbody:first').append('<tr><td scope="row">' + res.title +
+                '</td><td>' + date + '</td></tr>');
+        });
+    })
+}
 
 function showMovie(title) {
     api

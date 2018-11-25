@@ -79,6 +79,37 @@ function getPerson(name) {
         })
 }
 
+function getPersonRoles(name) {
+    let session = driver.session();
+    return session
+        .run("MATCH (p:Person{name:{title}})-[r:ACTS_IN]-(a:Movie) RETURN a.title as movie,a.releaseDate as year,r.name as role LIMIT 50", {title: name})
+        .then(results => {
+            session.close();
+            let tuples = [];
+
+            results.records.forEach(res => {
+                tuples.push({title: res.get('movie'), year: res.get('year'), role: res.get('role')});
+            });
+
+            return tuples;
+        })
+}
+
+function getPersonDirectedMovies(name) {
+    let session = driver.session();
+    return session
+        .run("MATCH (p:Person{name:{title}})-[r:DIRECTED]-(a:Movie) RETURN a.title as movies,a.releaseDate as year LIMIT 50", {title: name})
+        .then(results => {
+            session.close();
+            let tuples = [];
+
+            results.records.forEach(res => {
+                tuples.push({title: res.get('movies'), year: res.get('year')});
+            });
+
+            return tuples;
+        })
+}
 
 function getGraph(limit) {
     var session = driver.session();
@@ -111,5 +142,7 @@ function getGraph(limit) {
 exports.searchMovies = searchMovies;
 exports.getMovie = getMovie;
 exports.getPerson = getPerson;
+exports.getPersonRoles = getPersonRoles;
+exports.getPersonDirectedMovies = getPersonDirectedMovies;
 exports.getGraph = getGraph;
 

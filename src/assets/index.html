@@ -8,21 +8,23 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+
+    <script src="http://d3js.org/d3.v3.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="neo4j-web.min.js"></script>
     <link rel="stylesheet"
           href="http://neo4j-contrib.github.io/developer-resources/language-guides/assets/css/main.css">
     <title>Neo4j Movies</title>
 </head>
 
 <body>
-
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-
-<div class="container-fluid" style="min-height: 100%">
+<div class="container-fluid h-100">
     <div class="row">
-        <div class="col">
+        <div class="col-6">
             <div class="tabs">
                 <div class="tab-button-outer">
                     <ul id="tab-button">
@@ -40,12 +42,220 @@
                 </div>
 
                 <div id="tab01" class="tab-contents">
-                    <form role="search" class="navbar-form" id="search">
-                        <div class="form-group">
-                            <input type="text" value="Matrix" placeholder="Search for Movie Title" class="form-control" name="search">
+
+                    <div class="row">
+                        <div class="col-6">
+                            <form role="search" class="navbar-form" id="search">
+                                <div class="form-group">
+                                    <input type="text" value="Matrix" placeholder="Search for Movie Title"
+                                           class="form-control" name="search">
+                                </div>
+                                <button class="btn btn-default" type="submit">Search</button>
+                            </form>
                         </div>
-                        <button class="btn btn-default" type="submit">Search</button>
-                    </form>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <img id="avatar" src="src/assets/seems_good.JPG">
+                        </div>
+                        <div class="col-6">
+                            <div id="person_info">
+                                <p>DoB: 16.02.1996</p>
+                                <p>DoB: 16.02.1996</p>
+                                <p>DoB: 16.02.1996</p>
+                                <br>
+                                <p>DoB: 16.02.1996</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <h3>Фильмография</h3>
+                            <div id="filmography">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <a class="card-link" data-toggle="collapse" href="#actor">
+                                            Актер
+                                        </a>
+                                    </div>
+                                    <div id="actor" class="collapse show" data-parent="#filmography">
+                                        <div class="card-body">
+                                            <table id="actor_table" class="table">
+                                                <thead class="thead-light">
+                                                <tr>
+                                                    <th scope="col">Title</th>
+                                                    <th scope="col">Year</th>
+                                                    <th scope="col">Character</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td scope="row">Mark</td>
+                                                    <td>Otto</td>
+                                                    <td>@mdo</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Jacob</td>
+                                                    <td>Thornton</td>
+                                                    <td>@fat</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Larry</td>
+                                                    <td>the Bird</td>
+                                                    <td>@twitter</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <a class="collapsed card-link" data-toggle="collapse"
+                                           href="#director">
+                                            Режиссер
+                                        </a>
+                                    </div>
+                                    <div id="director" class="collapse" data-parent="#filmography">
+                                        <div class="card-body">
+                                            <table id="director_table" class="table">
+                                                <thead class="thead-light">
+                                                <tr>
+                                                    <th scope="col">Title</th>
+                                                    <th scope="col">Year</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td scope="row">Mark</td>
+                                                    <td>Otto</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Jacob</td>
+                                                    <td>Thornton</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Larry</td>
+                                                    <td>the Bird</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <h3>Прочее</h3>
+                            <div id="other">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <a class="card-link" data-toggle="collapse" href="#film_genres">
+                                            Жанры фильмов
+                                        </a>
+                                    </div>
+                                    <div id="film_genres" class="collapse show" data-parent="#other">
+                                        <div class="card-body">
+                                            <table class="table">
+                                                <thead class="thead-light">
+                                                <tr>
+                                                    <th scope="col">Genre</th>
+                                                    <th scope="col">Count</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td scope="row">Mark</td>
+                                                    <td>Otto</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Jacob</td>
+                                                    <td>Thornton</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Larry</td>
+                                                    <td>the Bird</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <a class="collapsed card-link" data-toggle="collapse"
+                                           href="#film_languages">
+                                            Языки фильмов
+                                        </a>
+                                    </div>
+                                    <div id="film_languages" class="collapse" data-parent="#other">
+                                        <div class="card-body">
+                                            <table class="table">
+                                                <thead class="thead-light">
+                                                <tr>
+                                                    <th scope="col">Language</th>
+                                                    <th scope="col">Count</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td scope="row">Mark</td>
+                                                    <td>Otto</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Jacob</td>
+                                                    <td>Thornton</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Larry</td>
+                                                    <td>the Bird</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <a class="collapsed card-link" data-toggle="collapse"
+                                           href="#colleagues">
+                                            Любимые коллеги
+                                        </a>
+                                    </div>
+                                    <div id="colleagues" class="collapse" data-parent="#other">
+                                        <div class="card-body">
+                                            <table class="table">
+                                                <thead class="thead-light">
+                                                <tr>
+                                                    <th scope="col">Name</th>
+                                                    <th scope="col">Count</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td scope="row">Mark</td>
+                                                    <td>Otto</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Jacob</td>
+                                                    <td>Thornton</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Larry</td>
+                                                    <td>the Bird</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div id="tab02" class="tab-contents">
                     <h2>Tab 2</h2>
@@ -61,7 +271,7 @@
                 </div>
             </div>
         </div>
-        <div class="col">
+        <div class="col-6">
             <div id="graph"></div>
         </div>
     </div>
@@ -69,6 +279,12 @@
 
 
 <style type="text/css">
+
+    #avatar {
+        max-height: 100%;
+        max-width: 100%;
+    }
+
     .col {
         min-height: 100%
     }
@@ -207,10 +423,6 @@
 </script>
 
 
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-<script src="http://d3js.org/d3.v3.min.js" type="text/javascript"></script>
-<script type="text/javascript" src="neo4j-web.min.js"></script>
-</body>
 
 </body>
 </html>

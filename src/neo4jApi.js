@@ -79,6 +79,23 @@ function getPerson(name) {
         })
 }
 
+function getPersonInfo(name) {
+    let session = driver.session();
+    return session.run('MATCH (p:Person{name:{title}}) RETURN p.birthday as birthday, p.name as name, p.biography as biography', {title: name})
+        .then(results => {
+            session.close();
+            let person_info;
+            results.records.forEach(res => {
+                person_info = {
+                    birthday: res.get('birthday'),
+                    name: res.get('name'),
+                    biography: res.get('biography')
+                };
+            });
+            return person_info;
+        })
+}
+
 function getPersonRoles(name) {
     let session = driver.session();
     return session
@@ -105,6 +122,54 @@ function getPersonDirectedMovies(name) {
 
             results.records.forEach(res => {
                 tuples.push({title: res.get('movies'), year: res.get('year')});
+            });
+
+            return tuples;
+        })
+}
+
+function getGenres(name) {
+    let session = driver.session();
+    return session
+        .run("MATCH (p:Person{name:{title}})-[r:DIRECTED]-(a:Movie) RETURN a.genre as genre, count(*) as count LIMIT 50", {title: name})
+        .then(results => {
+            session.close();
+            let tuples = [];
+
+            results.records.forEach(res => {
+                tuples.push({genre: res.get('genre'), count: res.get('count')});
+            });
+
+            return tuples;
+        })
+}
+
+function getLanguages(name) {
+    let session = driver.session();
+    return session
+        .run("MATCH (p:Person{name:{title}})-[r:DIRECTED]-(a:Movie) RETURN a.language as language, count(*) as count LIMIT 50", {title: name})
+        .then(results => {
+            session.close();
+            let tuples = [];
+
+            results.records.forEach(res => {
+                tuples.push({language: res.get('language'), count: res.get('count')});
+            });
+
+            return tuples;
+        })
+}
+
+function getCoworkers(name) {
+    let session = driver.session();
+    return session
+        .run("MATCH (p:Person{name:{title}})-[r:DIRECTED]-(m:Movie)-[]-(a:Actor) RETURN a.name as name, count(*) as count ORDER BY count DESC", {title: name})
+        .then(results => {
+            session.close();
+            let tuples = [];
+
+            results.records.forEach(res => {
+                tuples.push({name: res.get('name'), count: res.get('count')});
             });
 
             return tuples;
@@ -144,5 +209,9 @@ exports.getMovie = getMovie;
 exports.getPerson = getPerson;
 exports.getPersonRoles = getPersonRoles;
 exports.getPersonDirectedMovies = getPersonDirectedMovies;
+exports.getGenres = getGenres;
+exports.getLanguages = getLanguages;
+exports.getCoworkers = getCoworkers;
+exports.getPersonInfo = getPersonInfo;
 exports.getGraph = getGraph;
 

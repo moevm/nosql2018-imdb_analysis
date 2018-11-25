@@ -1,19 +1,40 @@
 var api = require('./neo4jApi');
 
 $(function () {
-    fillActor('Quentin Tarantino');
-    fillDirector('Quentin Tarantino');
-    renderGraph(api.getPerson('Quentin Tarantino'));
+    let start_name = 'Quentin Tarantino';
+    fillPersonInfo(start_name);
+    fillActor(start_name);
+    fillDirector(start_name);
+    fillGenre(start_name);
+    fillLanguages(start_name);
+    fillCoworkers(start_name);
+    renderGraph(api.getPerson(start_name));
     search();
 
     $("#search").submit(e => {
         e.preventDefault();
         let name = $("#search").find("input[name=search]").val();
+        fillPersonInfo(name);
         fillActor(name);
         fillDirector(name);
+        fillGenre(name);
+        fillLanguages(name);
+        fillCoworkers(name);
         renderGraph(api.getPerson(name));
     });
 });
+
+function fillPersonInfo(name) {
+    let personInfo = $('#person_info');
+    personInfo.find('*').remove();
+
+    api.getPersonInfo(name).then(res => {
+        let date = new Date(parseInt(res.birthday, 10)).getFullYear();
+        personInfo.append('<h2 id="person_name">' + res.name + '</h2>');
+        personInfo.append('<p id="person_birthday">' + date + '</p>');
+        personInfo.append('<p id="person_biography">' + res.biography + '</p>');
+    })
+}
 
 function fillActor(name) {
     $('#actor_table').find('tbody:first').find('tr').remove();
@@ -31,10 +52,39 @@ function fillDirector(name) {
     $('#director_table').find('tbody:first').find('tr').remove();
     api.getPersonDirectedMovies(name).then(resuts => {
         resuts.forEach(res => {
-            console.log(date + ';' + res.title);
             let date = new Date(parseInt(res.year, 10)).getFullYear();
             $('#director_table').find('tbody:first').append('<tr><td scope="row">' + res.title +
                 '</td><td>' + date + '</td></tr>');
+        });
+    })
+}
+
+function fillGenre(name) {
+    $('#genre_table').find('tbody:first').find('tr').remove();
+    api.getGenres(name).then(resuts => {
+        resuts.forEach(res => {
+            $('#genre_table').find('tbody:first').append('<tr><td scope="row">' + res.genre +
+                '</td><td>' + res.count + '</td></tr>');
+        });
+    })
+}
+
+function fillLanguages(name) {
+    $('#language_table').find('tbody:first').find('tr').remove();
+    api.getLanguages(name).then(resuts => {
+        resuts.forEach(res => {
+            $('#language_table').find('tbody:first').append('<tr><td scope="row">' + res.language +
+                '</td><td>' + res.count + '</td></tr>');
+        });
+    })
+}
+
+function fillCoworkers(name) {
+    $('#coworkers_table').find('tbody:first').find('tr').remove();
+    api.getCoworkers(name).then(resuts => {
+        resuts.forEach(res => {
+            $('#coworkers_table').find('tbody:first').append('<tr><td scope="row">' + res.name +
+                '</td><td>' + res.count + '</td></tr>');
         });
     })
 }

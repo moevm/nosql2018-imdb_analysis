@@ -28,9 +28,9 @@
             <div class="tabs">
                 <div class="tab-button-outer">
                     <ul id="tab-button">
-                        <li><a href="#tab01">Person</a></li>
-                        <li><a href="#tab02">Movie</a></li>
-                        <li><a href="#tab03">Relation</a></li>
+                        <li><a id="tab01_link" href="#tab01">Person</a></li>
+                        <li><a id="tab02_link" href="#tab02">Movie</a></li>
+                        <li><a id="tab03_link" href="#tab03">Relation</a></li>
                     </ul>
                 </div>
                 <div class="tab-select-outer">
@@ -47,7 +47,7 @@
                         <div class="col-6">
                             <form role="search" class="navbar-form" id="search_person">
                                 <div class="form-group">
-                                    <input type="text" value="Matrix" placeholder="Search for Movie Title"
+                                    <input type="text" value="Quentin Tarantino" placeholder="Search for Movie Title"
                                            class="form-control" name="search">
                                 </div>
                                 <button class="btn btn-default" id="search_person_button" type="button">Search</button>
@@ -263,7 +263,7 @@
                                     <input type="text" value="Matrix" placeholder="Search for Movie Title"
                                            class="form-control" name="search">
                                 </div>
-                                <button class="btn btn-default" type="submit">Search</button>
+                                <button class="btn btn-default" type="button">Search</button>
                             </form>
                         </div>
                     </div>
@@ -354,14 +354,94 @@
 
                 </div>
                 <div id="tab03" class="tab-contents">
-                    <h2>Tab 3</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius quos aliquam consequuntur, esse
-                        provident impedit minima porro! Laudantium laboriosam culpa quis fugiat ea, architecto velit ab,
-                        deserunt rem quibusdam voluptatum.</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <form role="search" class="navbar-form" id="search_rel">
+                                <div class="form-group">
+                                    <input type="text" value="Uma Thurman" placeholder="Search for Movie Title"
+                                           class="form-control" name="search_1">
+                                    <input type="text" value="Quentin Tarantino" placeholder="Search for Movie Title"
+                                           class="form-control" name="search_2">
+                                </div>
+                                <button class="btn btn-default" type="button">Go!</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <h3>Cast</h3>
+                            <div id="rel_persons">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <a class="card-link" data-toggle="collapse" href="#colleagues_rel">
+                                            Common Colleagues
+                                        </a>
+                                    </div>
+                                    <div id="colleagues_rel" class="collapse show" data-parent="#rel_persons">
+                                        <div class="card-body">
+                                            <table id="collegues_rel_table" class="table">
+                                                <thead class="thead-light">
+                                                <tr>
+                                                    <th scope="col">Name</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td scope="row">Mark</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Jacob</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Larry</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <a class="collapsed card-link" data-toggle="collapse"
+                                           href="#movie_rel">
+                                            Common films
+                                        </a>
+                                    </div>
+                                    <div id="movie_rel" class="collapse" data-parent="#rel_persons">
+                                        <div class="card-body">
+                                            <table id="movie_rel_table" class="table">
+                                                <thead class="thead-light">
+                                                <tr>
+                                                    <th scope="col">Title</th>
+                                                    <th scope="col">Year</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td scope="row">Mark</td>
+                                                    <td>Otto</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Jacob</td>
+                                                    <td>Thornton</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Larry</td>
+                                                    <td>the Bird</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
-        <div class="col-6">
+        <div class="col-6" style="min-height: 800px">
             <div id="graph"></div>
         </div>
     </div>

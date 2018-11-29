@@ -10,35 +10,80 @@ $(function () {
     fillCoworkers(start_name);
     renderGraph(api.getPerson(start_name));
 
-    $("#search_person_button").click(e => {
-        // e.preventDefault();
-        let name = $("#search_person").find("input[name=search]").val();
-        fillPersonInfo(name);
-        fillActor(name);
-        fillDirector(name);
-        fillGenre(name);
-        fillLanguages(name);
-        fillCoworkers(name);
-        renderGraph(api.getPerson(name));
+    $("#tab01_link").click(e => {
+        console.log("HERE1");
+        fillFirstTab();
+    });
+    $("#tab02_link").click(e => {
+        console.log("HERE2");
+        fillSecondTab();
+    });
+    $("#tab03_link").click(e => {
+        console.log("HERE3");
+        fillThirdTab();
     });
 
-    $("#search_movie").submit(e => {
-        e.preventDefault();
-        let name = $("#search_movie").find("input[name=search]").val();
-        fillMovieInfo(name);
-        fillMovieDirectors(name);
-        fillMovieCast(name);
-        renderGraph(api.getMovie(name))
-        // fillActor(name);
-        // fillDirector(name);
-        // fillGenre(name);
-        // fillLanguages(name);
-        // fillCoworkers(name);
-        // renderGraph(api.getPerson(name));
+
+    $("#search_person_button").click(e => {
+        fillFirstTab();
+    });
+
+    $("#search_movie").click(e => {
+        fillSecondTab();
+    });
+
+    $("#search_rel").click(e => {
+        fillThirdTab();
     });
 
     // renderGraph(api.getLink("Kevin Bacon","Meg Ryan"))
 });
+
+function fillThirdTab() {
+    let name1 = $("#search_rel").find("input[name=search_1]").val();
+    let name2 = $("#search_rel").find("input[name=search_2]").val();
+    fillCommonColleagues(name1,name2);
+    fillCommonMovies(name1, name2);
+    renderGraph(api.getLink(name1,name2))
+}
+function fillSecondTab() {
+    let name = $("#search_movie").find("input[name=search]").val();
+    fillMovieInfo(name);
+    fillMovieDirectors(name);
+    fillMovieCast(name);
+    renderGraph(api.getMovie(name))
+}
+
+function fillFirstTab() {
+    let name = $("#search_person").find("input[name=search]").val();
+    fillPersonInfo(name);
+    fillActor(name);
+    fillDirector(name);
+    fillGenre(name);
+    fillLanguages(name);
+    fillCoworkers(name);
+    renderGraph(api.getPerson(name));
+}
+
+function fillCommonMovies(name1,name2) {
+    $('#movie_rel_table').find('tbody:first').find('tr').remove();
+    api.getCommonMovies(name1,name2).then(resuts => {
+        resuts.forEach(res => {
+            let date = new Date(parseInt(res.year, 10)).getFullYear();
+            $('#movie_rel_table').find('tbody:first').append('<tr><td scope="row">' + res.name + '</td><td>'+date+'</td></tr>');
+        });
+    })
+}
+
+function fillCommonColleagues(name1,name2) {
+    $('#collegues_rel_table').find('tbody:first').find('tr').remove();
+    api.getCommonColleagues(name1,name2).then(resuts => {
+        resuts.forEach(res => {
+            $('#collegues_rel_table').find('tbody:first').append('<tr><td scope="row">' + res.name + '</td></tr>');
+        });
+    })
+}
+
 
 function fillMovieCast(name) {
     $('#actor_cast_table').find('tbody:first').find('tr').remove();

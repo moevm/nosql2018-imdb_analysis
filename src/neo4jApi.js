@@ -59,6 +59,44 @@ function getLink(name1, name2) {
         })
 }
 
+function getCommonColleagues(name1, name2) {
+    let session = driver.session();
+    return session
+        .run("MATCH (bacon:Person {name:{title1}})-[]-(m:Movie)-[]-(meg:Person {name:{title2}}) MATCH (t:Person)-[]-(m) WHERE t <> bacon AND t <> meg RETURN Distinct(t.name) as name LIMIT 50", {
+            title1: name1,
+            title2: name2
+        })
+        .then(results => {
+            session.close();
+            let tuples = [];
+
+            results.records.forEach(res => {
+                tuples.push({name: res.get('name')});
+            });
+
+            return tuples;
+        })
+}
+
+function getCommonMovies(name1, name2) {
+    let session = driver.session();
+    return session
+        .run("MATCH (bacon:Person {name:{title1}})-[]-(m:Movie)-[]-(meg:Person {name:{title2}}) MATCH (t:Person)-[]-(m) WHERE t <> bacon AND t <> meg RETURN Distinct(m.title) as name, m.releaseDate as year LIMIT 50", {
+            title1: name1,
+            title2: name2
+        })
+        .then(results => {
+            session.close();
+            let tuples = [];
+
+            results.records.forEach(res => {
+                tuples.push({name: res.get('name'), year: res.get('year')});
+            });
+
+            return tuples;
+        })
+}
+
 //TODO Rename variables
 function getMovie(name) {
     let session = driver.session();
@@ -285,6 +323,8 @@ function getGraph(limit) {
         });
 }
 
+exports.getCommonColleagues = getCommonColleagues;
+exports.getCommonMovies = getCommonMovies;
 exports.getMovieCast = getMovieCast;
 exports.getMovieDirectors = getMovieDirectors;
 exports.getLink = getLink;

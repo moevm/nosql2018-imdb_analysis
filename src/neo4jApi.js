@@ -6,50 +6,124 @@ var _ = require('lodash');
 var neo4j = window.neo4j.v1;
 var driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic("neo4j", "qwerty"));
 
-function searchMovies(queryString) {
-    var session = driver.session();
-    return session
-        .run(
-            'MATCH (movie:Movie) \
-            WHERE movie.title =~ {title} \
-            RETURN movie',
-            {title: '(?i).*' + queryString + '.*'}
-        )
-        .then(result => {
+
+//TODO Rename variables
+function getMovieInfo(name) {
+    let session = driver.session();
+    return session.run('MATCH (m:Movie) WHERE m.title =~ {title} RETURN m.title as name, m.releaseDate as birthday, m.description as biography LIMIT 1', {title: '.*' + name + '.*'})
+        .then(results => {
             session.close();
-            return result.records.map(record => {
-                return new Movie(record.get('movie'));
+            let person_info;
+            results.records.forEach(res => {
+                person_info = {
+                    birthday: res.get('birthday'),
+                    name: res.get('name'),
+                    biography: res.get('biography')
+                };
             });
+            return person_info;
         })
-        .catch(error => {
-            session.close();
-            throw error;
-        });
 }
 
-function getMovie(title) {
-    var session = driver.session();
-    return session
-        .run(
-            "MATCH (movie:Movie {title:{title}}) \
-            OPTIONAL MATCH (movie)<-[r]-(person:Person) \
-            RETURN movie.title AS title, \
-            collect([person.name, \
-                 head(split(lower(type(r)), '_')), r.roles]) AS cast \
-            LIMIT 1", {title})
-        .then(result => {
+function getLink(name1, name2) {
+    let session = driver.session();
+    return session.run('MATCH p=shortestPath((bacon:Person {name:{title1}})-[*]-(meg:Person {name:{title2}})) ' +
+        'UNWIND relationships(p) as r ' +
+        'RETURN r.name as role,startNode(r).name as source,endNode(r).title as target LIMIT 50', {
+        title1: name1,
+        title2: name2
+    })
+        .then(results => {
             session.close();
+            var nodes = [], rels = [], i = 0;
+            results.records.forEach(res => {
+                var source_node = {title: res.get('source'), label: 'actor'};
+                var target_node = {title: res.get('target'), label: 'movie'};
 
-            if (_.isEmpty(result.records))
-                return null;
+                var source = _.findIndex(nodes, source_node);
+                var target = _.findIndex(nodes, target_node);
 
-            var record = result.records[0];
-            return new MovieCast(record.get('title'), record.get('cast'));
+                if (source == -1) {
+                    nodes.push(source_node);
+                    source = i;
+                    i++;
+                }
+                if (target == -1) {
+                    nodes.push(target_node);
+                    target = i;
+                    i++;
+                }
+                rels.push({source, target})
+            });
+            return {nodes, links: rels};
         })
-        .catch(error => {
+}
+
+//TODO Rename variables
+function getMovie(name) {
+    let session = driver.session();
+    return session.run('MATCH (p:Movie)-[]-(a:Person) WHERE p.title =~ {title} RETURN p.title as title,collect(a.name) as actors ORDER BY title LIMIT 1', {title: '.*' + name + '.*'})
+        .then(results => {
             session.close();
-            throw error;
-        });
+            var nodes = [], rels = [], i = 0;
+            results.records.forEach(res => {
+                console.log(res);
+                nodes.push({title: res.get('title'), label: 'movie'});
+                var target = i;
+                i++;
+
+                res.get('actors').forEach(name => {
+                    var movie = {title: name, label: 'actor'};
+                    var source = _.findIndex(nodes, movie);
+                    if (source == -1) {
+                        nodes.push(movie);
+                        source = i;
+                        i++;
+                    }
+                    rels.push({source, target})
+                })
+            });
+
+            return {nodes, links: rels};
+        })
+}
+
+function getMovieDirectors(name) {
+    let session = driver.session();
+    return session
+        .run('MATCH (p:Movie)-[:DIRECTED]-(a:Person) WHERE p.title =~ {title} RETURN p.title as title,collect(a.name) as actors ORDER BY title LIMIT 1', {title: '.*' + name + '.*'})
+        .then(results => {
+            session.close();
+            let tuples = [];
+
+            results.records.forEach(res => {
+                res.get('actors').forEach(name => {
+                    tuples.push({name: name});
+                })
+            });
+
+            return tuples;
+        })
+}
+
+function getMovieCast(name) {
+    let session = driver.session();
+    return session
+        .run('MATCH (p:Movie)-[r:ACTS_IN]-(a:Person) WHERE p.title =~ {title} RETURN p.title as title,collect(a.name) as actors,collect(r.name) as role ORDER BY title LIMIT 1', {title: '.*' + name + '.*'})
+        .then(results => {
+            session.close();
+            let tuples = [];
+            results.records.forEach(res => {
+                // console.log(res.get('actors')[0],"<------- HERE");
+                var i = 0;
+                res.get('actors').forEach(name => {
+                    tuples.push({name: name, role: res.get('role')[i]});
+                    i++;
+                })
+            });
+
+            return tuples;
+        })
 }
 
 function getPerson(name) {
@@ -74,11 +148,11 @@ function getPerson(name) {
                     rels.push({source, target})
                 })
             });
-
             return {nodes, links: rels};
         })
 }
 
+//TODO Name LIKE search - now it's strict search by name
 function getPersonInfo(name) {
     let session = driver.session();
     return session.run('MATCH (p:Person{name:{title}}) RETURN p.birthday as birthday, p.name as name, p.biography as biography', {title: name})
@@ -96,6 +170,7 @@ function getPersonInfo(name) {
         })
 }
 
+//TODO Name LIKE search - now it's strict search by name
 function getPersonRoles(name) {
     let session = driver.session();
     return session
@@ -112,6 +187,7 @@ function getPersonRoles(name) {
         })
 }
 
+//TODO Name LIKE search - now it's strict search by name
 function getPersonDirectedMovies(name) {
     let session = driver.session();
     return session
@@ -128,6 +204,7 @@ function getPersonDirectedMovies(name) {
         })
 }
 
+//TODO Name LIKE search - now it's strict search by name
 function getGenres(name) {
     let session = driver.session();
     return session
@@ -144,6 +221,7 @@ function getGenres(name) {
         })
 }
 
+//TODO Name LIKE search - now it's strict search by name
 function getLanguages(name) {
     let session = driver.session();
     return session
@@ -160,6 +238,7 @@ function getLanguages(name) {
         })
 }
 
+//TODO Name LIKE search - now it's strict search by name
 function getCoworkers(name) {
     let session = driver.session();
     return session
@@ -176,6 +255,8 @@ function getCoworkers(name) {
         })
 }
 
+
+//TODO Name LIKE search - now it's strict search by name
 function getGraph(limit) {
     var session = driver.session();
     return session.run(
@@ -204,8 +285,11 @@ function getGraph(limit) {
         });
 }
 
-exports.searchMovies = searchMovies;
+exports.getMovieCast = getMovieCast;
+exports.getMovieDirectors = getMovieDirectors;
+exports.getLink = getLink;
 exports.getMovie = getMovie;
+exports.getMovieInfo = getMovieInfo;
 exports.getPerson = getPerson;
 exports.getPersonRoles = getPersonRoles;
 exports.getPersonDirectedMovies = getPersonDirectedMovies;

@@ -9,11 +9,10 @@ $(function () {
     fillLanguages(start_name);
     fillCoworkers(start_name);
     renderGraph(api.getPerson(start_name));
-    search();
 
-    $("#search").submit(e => {
-        e.preventDefault();
-        let name = $("#search").find("input[name=search]").val();
+    $("#search_person_button").click(e => {
+        // e.preventDefault();
+        let name = $("#search_person").find("input[name=search]").val();
         fillPersonInfo(name);
         fillActor(name);
         fillDirector(name);
@@ -22,7 +21,56 @@ $(function () {
         fillCoworkers(name);
         renderGraph(api.getPerson(name));
     });
+
+    $("#search_movie").submit(e => {
+        e.preventDefault();
+        let name = $("#search_movie").find("input[name=search]").val();
+        fillMovieInfo(name);
+        fillMovieDirectors(name);
+        fillMovieCast(name);
+        renderGraph(api.getMovie(name))
+        // fillActor(name);
+        // fillDirector(name);
+        // fillGenre(name);
+        // fillLanguages(name);
+        // fillCoworkers(name);
+        // renderGraph(api.getPerson(name));
+    });
+
+    // renderGraph(api.getLink("Kevin Bacon","Meg Ryan"))
 });
+
+function fillMovieCast(name) {
+    $('#actor_cast_table').find('tbody:first').find('tr').remove();
+    api.getMovieCast(name).then(resuts => {
+        resuts.forEach(res => {
+            $('#actor_cast_table').find('tbody:first').append('<tr><td scope="row">' + res.name + '</td><td>' + res.role + '</td></tr>');
+        });
+    })
+}
+
+function fillMovieDirectors(name) {
+    $('#director-table').find('tbody:first').find('tr').remove();
+    api.getMovieDirectors(name).then(resuts => {
+        resuts.forEach(res => {
+            $('#director-table').find('tbody:first').append('<tr><td scope="row">' + res.name + '</td></tr>');
+        });
+    })
+}
+
+function fillMovieInfo(name) {
+    let personInfo = $('#movie_info');
+    personInfo.find('*').remove();
+
+    //TODO Rename variables
+    api.getMovieInfo(name).then(res => {
+        let date = new Date(parseInt(res.birthday, 10)).getFullYear();
+        personInfo.append('<h2 id="movie_name">' + res.name + '</h2>');
+        personInfo.append('<p id="movie_release">' + date + '</p>');
+        personInfo.append('<p id="movie_summary">' + res.biography + '</p>');
+    })
+}
+
 
 function fillPersonInfo(name) {
     let personInfo = $('#person_info');
@@ -89,44 +137,6 @@ function fillCoworkers(name) {
     })
 }
 
-function showMovie(title) {
-    api
-        .getMovie(title)
-        .then(movie => {
-            if (!movie) return;
-
-            $("#title").text(movie.title);
-            $("#poster").attr("src", "http://neo4j-contrib.github.io/developer-resources/language-guides/assets/posters/" + movie.title + ".jpg");
-            var $list = $("#crew").empty();
-            movie.cast.forEach(cast => {
-                $list.append($("<li>" + cast.name + " " + cast.job + (cast.job == "acted" ? " as " + cast.role : "") + "</li>"));
-            });
-        }, "json");
-}
-
-function search() {
-    var query = $("#search").find("input[name=search]").val();
-    api
-        .searchMovies(query)
-        .then(movies => {
-            var t = $("table#results tbody").empty();
-
-            if (movies) {
-                movies.forEach(movie => {
-                    $("<tr><td class='movie'>" + movie.title + "</td><td>" + movie.released + "</td><td>" + movie.tagline + "</td></tr>").appendTo(t)
-                        .click(function () {
-                            showMovie($(this).find("td.movie").text());
-                        })
-                });
-
-                var first = movies[0];
-                if (first) {
-                    showMovie(first.title);
-                }
-            }
-        });
-}
-
 function renderGraph(fun) {
     var width = 800, height = 800;
     var force = d3
@@ -145,6 +155,8 @@ function renderGraph(fun) {
         .attr("height", "100%")
         .attr("pointer-events", "all");
     fun.then(graph => {
+        // console.log(graph.nodes);
+        // console.log(graph.links);
         force.nodes(graph.nodes).links(graph.links).start();
 
         // svg.selectAll(".link").remove();//add this to remove the links

@@ -45,19 +45,19 @@
 
                     <div class="row">
                         <div class="col-6">
-                            <form role="search" class="navbar-form" id="search">
+                            <form role="search" class="navbar-form" id="search_person">
                                 <div class="form-group">
                                     <input type="text" value="Matrix" placeholder="Search for Movie Title"
                                            class="form-control" name="search">
                                 </div>
-                                <button class="btn btn-default" type="submit">Search</button>
+                                <button class="btn btn-default" id="search_person_button" type="button">Search</button>
                             </form>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-6">
-                            <img id="avatar" src="src/assets/seems_good.JPG">
+                            <img id="avatar" class="ava" src="src/assets/seems_good.JPG">
                         </div>
                         <div class="col-6">
                             <div id="person_info">
@@ -256,10 +256,102 @@
 
                 </div>
                 <div id="tab02" class="tab-contents">
-                    <h2>Tab 2</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius quos aliquam consequuntur, esse
-                        provident impedit minima porro! Laudantium laboriosam culpa quis fugiat ea, architecto velit ab,
-                        deserunt rem quibusdam voluptatum.</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <form role="search" class="navbar-form" id="search_movie">
+                                <div class="form-group">
+                                    <input type="text" value="Matrix" placeholder="Search for Movie Title"
+                                           class="form-control" name="search">
+                                </div>
+                                <button class="btn btn-default" type="submit">Search</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <img id="poster" class="ava" src="src/assets/seems_good.JPG">
+                        </div>
+                        <div class="col-6">
+                            <div id="movie_info">
+                                <h2 id="movie_name"></h2>
+                                <p id="movie_release"></p>
+                                <p id="movie_summary"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <h3>Cast</h3>
+                            <div id="cast">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <a class="card-link" data-toggle="collapse" href="#directors">
+                                            Directors
+                                        </a>
+                                    </div>
+                                    <div id="directors" class="collapse show" data-parent="#cast">
+                                        <div class="card-body">
+                                            <table id="director-table" class="table">
+                                                <thead class="thead-light">
+                                                <tr>
+                                                    <th scope="col">Name</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td scope="row">Mark</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Jacob</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Larry</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <a class="collapsed card-link" data-toggle="collapse"
+                                           href="#actor_cast">
+                                            Actor cast
+                                        </a>
+                                    </div>
+                                    <div id="actor_cast" class="collapse" data-parent="#cast">
+                                        <div class="card-body">
+                                            <table id="actor_cast_table" class="table">
+                                                <thead class="thead-light">
+                                                <tr>
+                                                    <th scope="col">Name</th>
+                                                    <th scope="col">Character</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td scope="row">Mark</td>
+                                                    <td>Otto</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Jacob</td>
+                                                    <td>Thornton</td>
+                                                </tr>
+                                                <tr>
+                                                    <td scope="row">Larry</td>
+                                                    <td>the Bird</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div id="tab03" class="tab-contents">
                     <h2>Tab 3</h2>
@@ -278,7 +370,7 @@
 
 <style type="text/css">
 
-    #avatar {
+    .ava {
         max-height: 100%;
         max-width: 100%;
     }

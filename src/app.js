@@ -39,20 +39,24 @@ $(function () {
     // renderGraph(api.getLink("Kevin Bacon","Meg Ryan"))
 });
 
+
 function fillThirdTab() {
     let name1 = $("#search_rel").find("input[name=search_1]").val();
     let name2 = $("#search_rel").find("input[name=search_2]").val();
-    fillCommonColleagues(name1,name2);
+    fillCommonColleagues(name1, name2);
     fillCommonMovies(name1, name2);
-    renderGraph(api.getLink(name1,name2))
+    renderGraph(api.getLink(name1, name2))
 }
 function fillSecondTab() {
     let name = $("#search_movie").find("input[name=search]").val();
-    fillMovieInfo(name);
+    let film = fillMovieInfo(name);
+    console.log(film, '<------------HERE');
+    findMoviePoster(film);
     fillMovieDirectors(name);
     fillMovieCast(name);
     renderGraph(api.getMovie(name))
 }
+
 
 function fillFirstTab() {
     let name = $("#search_person").find("input[name=search]").val();
@@ -65,19 +69,20 @@ function fillFirstTab() {
     renderGraph(api.getPerson(name));
 }
 
-function fillCommonMovies(name1,name2) {
+
+function fillCommonMovies(name1, name2) {
     $('#movie_rel_table').find('tbody:first').find('tr').remove();
-    api.getCommonMovies(name1,name2).then(resuts => {
+    api.getCommonMovies(name1, name2).then(resuts => {
         resuts.forEach(res => {
             let date = new Date(parseInt(res.year, 10)).getFullYear();
-            $('#movie_rel_table').find('tbody:first').append('<tr><td scope="row">' + res.name + '</td><td>'+date+'</td></tr>');
+            $('#movie_rel_table').find('tbody:first').append('<tr><td scope="row">' + res.name + '</td><td>' + date + '</td></tr>');
         });
     })
 }
 
-function fillCommonColleagues(name1,name2) {
+function fillCommonColleagues(name1, name2) {
     $('#collegues_rel_table').find('tbody:first').find('tr').remove();
-    api.getCommonColleagues(name1,name2).then(resuts => {
+    api.getCommonColleagues(name1, name2).then(resuts => {
         resuts.forEach(res => {
             $('#collegues_rel_table').find('tbody:first').append('<tr><td scope="row">' + res.name + '</td></tr>');
         });
@@ -113,7 +118,29 @@ function fillMovieInfo(name) {
         personInfo.append('<h2 id="movie_name">' + res.name + '</h2>');
         personInfo.append('<p id="movie_release">' + date + '</p>');
         personInfo.append('<p id="movie_summary">' + res.biography + '</p>');
-    })
+
+        findMoviePoster(res.name);
+    });
+}
+
+function findMoviePoster(film) {
+    $('#poster').find('img').remove();
+
+    $.getJSON("https://api.themoviedb.org/3/search/movie?api_key=15d2ea6d0dc1d476efbca3eba2b9bbfb&query=" + film + "&callback=?", function (json) {
+        if (json != "Nothing found.") {
+            console.log(json);
+            $('#poster').append('<img src=\"http://image.tmdb.org/t/p/w500/' + json.results[0].poster_path + '\" class="ava" >');
+        } else {
+            // $.getJSON("https://api.themoviedb.org/3/search/movie?api_key=15d2ea6d0dc1d476efbca3eba2b9bbfb&query=goonies&callback=?", function (json) {
+            //
+            //     console.log(json);
+            //     $('#poster').html('<div class="alert"><p>We\'re afraid nothing was found for that search.</p></div><p>Perhaps you were looking for The Goonies?</p><img id="thePoster" src="http://image.tmdb.org/t/p/w500/' + json[0].poster_path + ' class="img-responsive" />');
+            // });
+            $('#poster').append('<img class="ava" src="src/assets/seems_good.JPG">');
+
+        }
+    });
+    return false;
 }
 
 

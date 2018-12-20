@@ -4,7 +4,36 @@ var MovieCast = require('./models/MovieCast');
 var _ = require('lodash');
 
 var neo4j = window.neo4j.v1;
-var driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic("neo4j", "qwerty"));
+var driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic("neo4j", "123"));
+
+
+function exportDB(path) {
+    let session = driver.session();
+    return session.run('CALL apoc.export.graphml.all({title}, {useTypes:true, storeNodeIds:false})', {title: path})
+        .then(res => {
+            session.close();
+        })
+}
+
+function clear() {
+    let session = driver.session();
+    return session.run('MATCH (n) DETACH DELETE n')
+        .then(res => {
+            session.close();
+            location.reload();
+        })
+}
+
+function importDB(path) {
+    let session = driver.session();
+    let new_path = 'file:///' + path;
+    console.log(new_path);
+    return session.run('CALL apoc.import.graphml({title},{batchSize: 10000, readLabels: true, storeNodeIds: false, defaultRelationshipType:"RELATED"})', {title: new_path})
+        .then(res => {
+            session.close();
+            location.reload();
+        })
+}
 
 
 //TODO Rename variables
@@ -338,4 +367,7 @@ exports.getLanguages = getLanguages;
 exports.getCoworkers = getCoworkers;
 exports.getPersonInfo = getPersonInfo;
 exports.getGraph = getGraph;
+exports.exportDB = exportDB;
+exports.importDB = importDB;
+exports.clear = clear;
 

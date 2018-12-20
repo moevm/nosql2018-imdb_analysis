@@ -11,15 +11,12 @@ $(function () {
     renderGraph(api.getPerson(start_name));
 
     $("#tab01_link").click(e => {
-        console.log("HERE1");
         fillFirstTab();
     });
     $("#tab02_link").click(e => {
-        console.log("HERE2");
         fillSecondTab();
     });
     $("#tab03_link").click(e => {
-        console.log("HERE3");
         fillThirdTab();
     });
 
@@ -36,9 +33,19 @@ $(function () {
         fillThirdTab();
     });
 
+    $('#export').on('click', function () {
+        api.exportDB('D:/test_db/test_export.graphml');
+    });
+
+    $('#import').on('click', function () {
+        api.importDB('D:/test_db/test.graphml');
+    });
+    $('#clear').on('click', function () {
+        api.clear();
+    });
+
     // renderGraph(api.getLink("Kevin Bacon","Meg Ryan"))
 });
-
 
 function fillThirdTab() {
     let name1 = $("#search_rel").find("input[name=search_1]").val();
@@ -47,6 +54,7 @@ function fillThirdTab() {
     fillCommonMovies(name1, name2);
     renderGraph(api.getLink(name1, name2))
 }
+
 function fillSecondTab() {
     let name = $("#search_movie").find("input[name=search]").val();
     let film = fillMovieInfo(name);
@@ -215,7 +223,7 @@ function renderGraph(fun) {
         .layout
         .force()
         .charge(-200)
-        .linkDistance(30)
+        .linkDistance(150)
         .size([width, height]);
 
     d3.select("#graph").selectAll("*").remove();
@@ -249,7 +257,7 @@ function renderGraph(fun) {
             .attr("class", d => {
                 return "node " + d.label
             })
-            .attr("r", 8);
+            .attr("r", 5);
 
         node.append("text")
             .attr("x", 12)

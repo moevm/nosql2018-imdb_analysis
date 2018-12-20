@@ -57,7 +57,7 @@
 
                     <div class="row">
                         <div class="col-6">
-                            <img id="avatar" class="ava" src="src/assets/seems_good.JPG">
+                            <img id="avatar" class="ava" src="src/assets/qventin.jpg">
                         </div>
                         <div class="col-6">
                             <div id="person_info">
@@ -442,7 +442,19 @@
             </div>
         </div>
         <div class="col-6" style="min-height: 800px">
-            <div id="graph"></div>
+            <div class="row">
+                <div class="col-6">
+                    <button class="btn btn-default" id="import">Import</button>
+                    <button class="btn btn-default" id="export">Export</button>
+                    <button class="btn btn-default" id="clear">Clear</button>
+
+                </div>
+            </div>
+            <div class="row h-100">
+                <div class="col-12">
+                    <div id="graph"></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -471,11 +483,11 @@
     }
 
     .node.actor {
-        fill: #888;
+        fill: #0facd5;
     }
 
     .node.movie {
-        fill: #BBB;
+        fill: #2727bb;
     }
 
     .link {
@@ -562,10 +574,6 @@
 </style>
 
 <script>
-    function showPersonGraph() {
-        renderGraph(getPerson($('#personName').text()));
-    }
-
     $(function () {
         let $tabButtonItem = $('#tab-button li'),
             $tabSelect = $('#tab-select'),
@@ -597,7 +605,6 @@
         });
     });
 </script>
-
 
 
 </body>
